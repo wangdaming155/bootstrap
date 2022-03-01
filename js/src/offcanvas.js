@@ -5,12 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-  defineJQueryPlugin,
-  getElementFromSelector,
-  isDisabled,
-  isVisible
-} from './util/index'
+import { defineJQueryPlugin, getElementFromSelector, isDisabled, isVisible } from './util/index'
 import ScrollBarHelper from './util/scrollbar'
 import EventHandler from './dom/event-handler'
 import BaseComponent from './base-component'
@@ -40,6 +35,7 @@ const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
+const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY}`
 
@@ -157,6 +153,8 @@ class Offcanvas extends BaseComponent {
   }
 
   dispose() {
+    EventHandler.off(window, EVENT_KEY)
+
     this._backdrop.dispose()
     this._focustrap.deactivate()
     super.dispose()
@@ -186,10 +184,9 @@ class Offcanvas extends BaseComponent {
       }
     })
 
-    EventHandler.on(window, 'resize', () => {
-      // Add this check to help js be aligned with css changes on responsive offcanvas
+    EventHandler.on(window, EVENT_RESIZE, () => {
+      // this check helps js be aligned with css changes on responsive offcanvas
       if (this._isShown && getComputedStyle(this._element).position !== 'fixed') {
-        // this._backdrop.hide()
         this.hide()
       }
     })

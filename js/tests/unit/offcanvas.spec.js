@@ -501,6 +501,31 @@ describe('Offcanvas', () => {
         offCanvas.hide()
       })
     })
+
+    it('should call `hide` on resize, if element\'s position is not fixed any more', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+
+        const offCanvasEl = fixtureEl.querySelector('div')
+        const offCanvas = new Offcanvas(offCanvasEl)
+
+        spyOn(offCanvas, 'hide').and.callThrough()
+
+        offCanvasEl.addEventListener('shown.bs.offcanvas', () => {
+          const resizeEvent = createEvent('resize')
+          offCanvasEl.style.removeProperty('position')
+
+          window.dispatchEvent(resizeEvent)
+          setTimeout(() => {
+            expect(offCanvas.hide).toHaveBeenCalled()
+
+            resolve()
+          })
+        })
+
+        offCanvas.show()
+      })
+    })
   })
 
   describe('dispose', () => {
@@ -525,6 +550,7 @@ describe('Offcanvas', () => {
       expect(focustrap.deactivate).toHaveBeenCalled()
       expect(offCanvas._focustrap).toBeNull()
       expect(Offcanvas.getInstance(offCanvasEl)).toBeNull()
+      expect(EventHandler.off).toHaveBeenCalledTimes(2)
     })
   })
 
